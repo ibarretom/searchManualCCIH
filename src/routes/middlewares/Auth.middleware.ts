@@ -18,7 +18,7 @@ export function AuthMiddleware(
 
   const correctPass = process.env.ADMIN_PASSWORD as string
 
-  if (compareSync(password as string, correctPass)) {
+  if (!compareSync(password as string, correctPass)) {
     return res.status(401).json({ error: 'Unauthorized' })
   }
 
