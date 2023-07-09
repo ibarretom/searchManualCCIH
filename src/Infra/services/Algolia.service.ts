@@ -29,6 +29,7 @@ export class AlgoliaService implements ISearchProvider {
       }
 
       const response = await index.saveObject(algoliaDocument)
+      console.log(response)
     } catch (error: any) {
       throw new Error(error)
     }
