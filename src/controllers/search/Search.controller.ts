@@ -6,7 +6,7 @@ export class SearchController {
 
   public async handle(req: Request, res: Response) {
     const { q } = req.query
-
+    console.log(q)
     const response = await this.searchUseCase.execute({
       match: {
         content: {

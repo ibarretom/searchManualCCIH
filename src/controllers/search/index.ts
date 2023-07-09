@@ -1,10 +1,15 @@
+import { AlgoliaClient } from '../../Infra/clients/Algolia.client'
+import { AlgoliaService } from '../../Infra/services/Algolia.service'
+import { ISearchProvider } from '../../Infra/services/ISearch.provider'
 import { SearchService } from '../../services/Search.service'
 import { SearchUseCase } from '../../useCases/Search.useCase'
 import { SearchController } from './Search.controller'
-import { client } from '../../Infra/clients/Elastic.client'
 
-const searchService = new SearchService(client)
-const searchUseCase = new SearchUseCase(searchService)
-const searchController = new SearchController(searchUseCase)
+export function GetSearchController(
+  searchProvider: ISearchProvider
+): SearchController {
+  const searchService = new SearchService(searchProvider)
+  const searchUseCase = new SearchUseCase(searchService)
 
-export { searchController }
+  return new SearchController(searchUseCase)
+}

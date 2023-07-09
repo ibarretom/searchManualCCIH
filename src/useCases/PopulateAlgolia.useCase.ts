@@ -1,9 +1,9 @@
-import { ElasticService } from '../Infra/services/Elastic.service'
+import { AlgoliaService } from '../Infra/services/Algolia.service'
 import { PrismicService } from '../Infra/services/Prismic.service'
 
-export class PopulateElasticUseCase {
+export class PopulateAlgoliaUseCase {
   constructor(
-    private readonly elasticService: ElasticService,
+    private readonly algoliaService: AlgoliaService,
     private readonly prismicService: PrismicService
   ) {}
 
@@ -11,7 +11,7 @@ export class PopulateElasticUseCase {
     const documents = await this.prismicService.getPostDocuments()
 
     documents.forEach(async (document) => {
-      await this.elasticService.indexData(
+      await this.algoliaService.indexData(
         process.env.INDEX_NAME as string,
         document
       )

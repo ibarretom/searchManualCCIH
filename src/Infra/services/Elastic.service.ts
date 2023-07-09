@@ -1,7 +1,8 @@
 import { Client } from '@elastic/elasticsearch'
 import { Document } from '../../entities/Document'
+import { ISearchProvider } from './ISearch.provider'
 
-export class ElasticService {
+export class ElasticService implements ISearchProvider {
   constructor(private readonly client: Client) {
     this.client = client
   }
@@ -16,7 +17,6 @@ export class ElasticService {
 
       await this.client.indices.create({ index: indexName })
     } catch (error) {
-      console.log(error)
       throw new Error('Erro ao criar índice.')
     }
   }
@@ -33,7 +33,7 @@ export class ElasticService {
         return
       }
 
-      await this.client.index({
+      const response = await this.client.index({
         index: indexName,
         body: document,
       })
@@ -46,7 +46,9 @@ export class ElasticService {
     try {
       const response = await this.client.search({
         index: indexName,
-        body: { query },
+        body: {
+          query,
+        },
       })
 
       return response

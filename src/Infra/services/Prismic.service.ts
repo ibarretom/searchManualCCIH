@@ -17,7 +17,7 @@ export class PrismicService {
         objs.push({
           url: `/post/document/${doc.uid}`,
           titulo_post: doc.data.titulo_do_post[0].text,
-          html_id: randomUUID(),
+          html_id: md5(doc.data.titulo_do_post[0].text),
           titulo_do_texto: '',
           content: doc.data.intro_text[0].text,
           updated_at: doc.last_publication_date,

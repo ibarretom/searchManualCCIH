@@ -1,3 +1,4 @@
+import { Document } from '../entities/Document'
 import { SearchService } from '../services/Search.service'
 
 export class SearchUseCase {

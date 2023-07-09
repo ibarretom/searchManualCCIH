@@ -1,3 +1,4 @@
+import 'express-async-errors'
 import cors from 'cors'
 import express, {
   ErrorRequestHandler,
@@ -5,16 +6,20 @@ import express, {
   Request,
   Response,
 } from 'express'
-import 'express-async-errors'
 import { routes } from './routes/index.routes'
 import 'dotenv/config'
-import { ElasticService } from './Infra/services/Elastic.service'
-import { client } from './Infra/clients/Elastic.client'
+import { InitializeAlgolia } from './Infra/startups/InitializeAlgolia'
+import { InitializeElastic } from './Infra/startups/InitializeElastic'
 
 const app = express()
 
 app.use(cors())
 app.use(express.json())
+
+InitializeAlgolia()
+InitializeElastic()
+
+app.use(routes)
 
 app.use(
   (
@@ -26,9 +31,5 @@ app.use(
     return res.status(500).json({ message: 'Internal server error' })
   }
 )
-
-new ElasticService(client).createIndex(process.env.ELASTIC_INDEX as string)
-
-app.use(routes)
 
 export { app }
