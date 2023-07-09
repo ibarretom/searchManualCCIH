@@ -7,14 +7,25 @@ export class PopulateAlgoliaUseCase {
     private readonly prismicService: PrismicService
   ) {}
 
-  public async execute() {
+  public async execute(): Promise<void> {
     const documents = await this.prismicService.getPostDocuments()
+    const promises = []
 
-    documents.forEach(async (document) => {
-      await this.algoliaService.indexData(
-        process.env.INDEX_NAME as string,
-        document
+    documents.forEach((doc) =>
+      promises.push(
+        new Promise<void>((resolve, reject) => {
+          this.algoliaService
+            .indexData(process.env.INDEX_NAME as string, doc)
+            .then(() => {
+              resolve()
+            })
+            .catch((err) => {
+              reject(err)
+            })
+        })
       )
-    })
+    )
+
+    await Promise.all(promises)
   }
 }

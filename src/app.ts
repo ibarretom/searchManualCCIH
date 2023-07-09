@@ -9,7 +9,7 @@ import express, {
 import { routes } from './routes/index.routes'
 import 'dotenv/config'
 import { InitializeAlgolia } from './Infra/startups/InitializeAlgolia'
-import { InitializeElastic } from './Infra/startups/InitializeElastic'
+// import { InitializeElastic } from './Infra/startups/InitializeElastic'
 
 const app = express()
 
@@ -17,7 +17,7 @@ app.use(cors())
 app.use(express.json())
 
 InitializeAlgolia()
-InitializeElastic()
+// InitializeElastic()
 
 app.use(routes)
 

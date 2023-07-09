@@ -1,3 +1,4 @@
+import md5 from 'md5'
 import { Document } from '../../entities/Document'
 import { Query } from '../../valueObjects/Query'
 import { ISearchProvider } from './ISearch.provider'
@@ -7,9 +8,13 @@ export class AlgoliaService implements ISearchProvider {
 
   public async indexData(indexName: string, document: Document): Promise<void> {
     try {
+      const objectID = md5(
+        document.html_id + document.titulo_post + document.titulo_do_texto
+      )
+
       const documentExists = await this.getObject(
         indexName,
-        (hit: Document) => hit.html_id === document.html_id
+        (hit: Document & { objectID: string }) => hit.objectID === objectID
       )
 
       if (documentExists) {
@@ -19,13 +24,12 @@ export class AlgoliaService implements ISearchProvider {
       const index = this.client.initIndex(indexName)
 
       const algoliaDocument = {
-        objectID: document.html_id,
+        objectID: objectID,
         ...document,
       }
 
-      await index.saveObject(algoliaDocument)
+      const response = await index.saveObject(algoliaDocument)
     } catch (error: any) {
-      console.log(error)
       throw new Error(error)
     }
   }
@@ -58,7 +62,6 @@ export class AlgoliaService implements ISearchProvider {
 
       return response
     } catch (error: any) {
-      console.log(error)
       throw new Error(error)
     }
   }
