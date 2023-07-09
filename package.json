@@ -4,8 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "node dist/server.js",
     "start:dev": "tsx --watch server.ts",
-    "build": "tsup"
+    "build": "tsc --build"
   },
   "keywords": [],
   "author": "",
