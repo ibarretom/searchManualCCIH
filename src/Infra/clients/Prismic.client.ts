@@ -1,5 +1,5 @@
 import prismic from '@prismicio/client'
-import nodefetch from 'node-fetch'
+import fetch from 'node-fetch'
 import 'dotenv/config'
 
 const routes = [
@@ -10,7 +10,7 @@ const routes = [
 export const prismic_client = prismic.createClient(
   process.env.PRISMIC_ENDPOINT,
   {
-    nodefetch,
+    fetch: fetch,
     routes,
   }
 )

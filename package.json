@@ -7,7 +7,7 @@
     "start": "node dist/server.js",
     "start:dev": "tsx --watch server.ts",
     "build": "tsc --build",
-    "serve": "npm run build && npm run start"
+    "deploy": "npm install && npm run build"
   },
   "keywords": [],
   "author": "",
