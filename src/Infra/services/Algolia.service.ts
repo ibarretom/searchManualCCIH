@@ -35,6 +35,29 @@ export class AlgoliaService implements ISearchProvider {
     }
   }
 
+  public async updateData(
+    indexName: string,
+    document: Document
+  ): Promise<void> {
+    try {
+      const objectID = md5(
+        document.html_id + document.titulo_post + document.titulo_do_texto
+      )
+
+      const index = this.client.initIndex(indexName)
+
+      const algoliaDocument = {
+        objectID: objectID,
+        ...document,
+      }
+
+      const response = await index.saveObject(algoliaDocument)
+      console.log(response)
+    } catch (error: any) {
+      throw new Error(error)
+    }
+  }
+
   public async getObject(indexName: string, lambdaQuery: Function) {
     try {
       const index = this.client.initIndex(indexName)
@@ -47,6 +70,18 @@ export class AlgoliaService implements ISearchProvider {
         return null
       }
 
+      throw new Error(error)
+    }
+  }
+
+  public async getObjectById(indexName: string, id: string): Promise<any> {
+    try {
+      const index = this.client.initIndex(indexName)
+
+      const response = await index.getObject(id)
+
+      return response
+    } catch (error: any) {
       throw new Error(error)
     }
   }

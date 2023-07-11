@@ -21,6 +21,9 @@ export class ElasticService implements ISearchProvider {
     }
   }
 
+  getObjectById: (indexName: string, id: string) => Promise<any>
+  getObject: (indexName: string, lambdaQuery: Function) => Promise<any>
+
   public async indexData(indexName: string, document: Document): Promise<void> {
     try {
       const documentExists = (await this.search(indexName, {

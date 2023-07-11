@@ -1,11 +1,11 @@
-import { randomUUID } from 'crypto'
 import md5 from 'md5'
 import { Document } from '../../entities/Document'
+import { PrismicResponse } from '../../valueObjects/PrismicResponse'
 
 export class PrismicService {
   constructor(private readonly client: any) {}
 
-  public async getPostDocuments() {
+  public async getPostDocuments(): Promise<Document[]> {
     const response = await this.client.getAllByType('post', {
       pageSize: 100,
     })
@@ -37,5 +37,14 @@ export class PrismicService {
     })
 
     return objs
+  }
+
+  async getDocumentById(id: string): Promise<PrismicResponse> {
+    try {
+      const response = await this.client.getByID(id)
+      return response
+    } catch (err) {
+      throw new Error(err)
+    }
   }
 }
