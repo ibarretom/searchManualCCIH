@@ -5,6 +5,7 @@ import { Document } from '../entities/Document'
 import { PrismicResponse } from '../valueObjects/PrismicResponse'
 import { PrismicPostContent } from '../valueObjects/PrismicPostContent'
 import { IPrismicMapper } from '../domain/services/IPrismic.mapper'
+import { AlgoliaPostDocument } from '../entities/AlgoliaPostDocument'
 
 export class PrismicPublishWebhookUseCase {
   constructor(
@@ -105,30 +106,62 @@ export class PrismicPublishWebhookUseCase {
   private async updateDocument(document: PrismicResponse): Promise<void> {
     try {
       const promises = []
+      const documents_saved = (await this.searchProvider.getGroupedObjects(
+        process.env.INDEX_NAME,
+        `${document.id};parent_id`
+      )) as AlgoliaPostDocument[]
+
+      const published_docs: AlgoliaPostDocument[] = []
 
       if (document.data.intro_text.length > 0) {
+        const doc = this.prismicMapper.postToDocument(document, true)
+
         promises.push(
           new Promise<void>(async (resolve, reject) => {
             try {
-              await this.searchProvider.updateData(
-                process.env.INDEX_NAME,
-                this.prismicMapper.postToDocument(document, true)
-              )
+              await this.searchProvider.updateData(process.env.INDEX_NAME, doc)
               resolve()
             } catch (err) {
               reject(err)
             }
           })
         )
+
+        published_docs.push(doc)
       }
 
       document.data.conteudo.forEach((conteudo: PrismicPostContent) => {
+        const doc = this.prismicMapper.postToDocument(document, false, conteudo)
+
         promises.push(
           new Promise<void>(async (resolve, reject) => {
             try {
-              await this.searchProvider.updateData(
+              await this.searchProvider.updateData(process.env.INDEX_NAME, doc)
+              resolve()
+            } catch (err) {
+              reject(err)
+            }
+          })
+        )
+
+        published_docs.push(doc)
+      })
+
+      const documents_to_delete = documents_saved.filter(
+        (saved_doc: AlgoliaPostDocument) =>
+          published_docs.findIndex(
+            (published_doc: AlgoliaPostDocument) =>
+              published_doc.objectID == saved_doc.objectID
+          ) == -1
+      )
+
+      documents_to_delete.forEach((document: AlgoliaPostDocument) => {
+        promises.push(
+          new Promise<void>(async (resolve, reject) => {
+            try {
+              await this.searchProvider.deleteObject(
                 process.env.INDEX_NAME,
-                this.prismicMapper.postToDocument(document, false, conteudo)
+                document
               )
               resolve()
             } catch (err) {
