@@ -1,30 +1,27 @@
 import md5 from 'md5'
-import { PrismicResponse } from '../../valueObjects/PrismicResponse'
-import { AlgoliaPostDocument } from '../../entities/AlgoliaPostDocument'
 import { PrismicPostContent } from '../../valueObjects/PrismicPostContent'
+import { PrismicResponse } from '../../valueObjects/PrismicResponse'
 import { IPrismicMapper } from './IPrismic.mapper'
 
-export class AlgoliaMapper implements IPrismicMapper {
-  public postToDocument(
+export class ElasticMapper implements IPrismicMapper {
+  postToDocument(
     document: PrismicResponse,
     intro_text: boolean,
-    content = {} as PrismicPostContent
-  ): AlgoliaPostDocument {
-    const html_id = md5(document.data.titulo_do_post[0].text)
-
+    content?: PrismicPostContent
+  ): any {
     if (intro_text) {
-      return new AlgoliaPostDocument({
+      return {
         parent_id: document.id,
         url: `/post/document/${document.uid}`,
         titulo_post: document.data.titulo_do_post[0].text,
-        html_id,
+        html_id: md5(document.data.titulo_do_post[0].text),
         titulo_do_texto: '',
         content: document.data.intro_text[0].text,
         updated_at: document.last_publication_date,
-      })
+      }
     }
 
-    return new AlgoliaPostDocument({
+    return {
       parent_id: document.id,
       url: `/post/document/${document.uid}`,
       titulo_post: document.data.titulo_do_post[0].text,
@@ -32,6 +29,6 @@ export class AlgoliaMapper implements IPrismicMapper {
       titulo_do_texto: content.titulo_do_texto[0].text,
       content: content.conteudo_parte1[0].text,
       updated_at: document.last_publication_date,
-    })
+    }
   }
 }

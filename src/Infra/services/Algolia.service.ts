@@ -7,15 +7,15 @@ import { AlgoliaPostDocument } from '../../entities/AlgoliaPostDocument'
 export class AlgoliaService implements ISearchProvider {
   constructor(private readonly client: any) {}
 
-  public async indexData(indexName: string, document: Document): Promise<void> {
+  public async indexData(
+    indexName: string,
+    document: AlgoliaPostDocument
+  ): Promise<void> {
     try {
-      const objectID = md5(
-        document.html_id + document.titulo_post + document.titulo_do_texto
-      )
-
       const documentExists = await this.getObject(
         indexName,
-        (hit: Document & { objectID: string }) => hit.objectID === objectID
+        (hit: Document & { objectID: string }) =>
+          hit.objectID === document.objectID
       )
 
       if (documentExists) {
@@ -24,12 +24,7 @@ export class AlgoliaService implements ISearchProvider {
 
       const index = this.client.initIndex(indexName)
 
-      const algoliaDocument = {
-        objectID: objectID,
-        ...document,
-      }
-
-      const response = await index.saveObject(algoliaDocument)
+      const response = await index.saveObject(document)
       console.log(response)
     } catch (error: any) {
       throw new Error(error)
