@@ -5,6 +5,7 @@ import { PrismicResponse } from '../valueObjects/PrismicResponse'
 import { AlgoliaMapper } from '../domain/services/Algolia.mapper'
 import { PrismicPostContent } from '../valueObjects/PrismicPostContent'
 import { IPrismicMapper } from '../domain/services/IPrismic.mapper'
+import { AlgoliaPostDocument } from '../entities/AlgoliaPostDocument'
 
 export class PrismicUnpublishWebhookUseCase {
   constructor(
@@ -19,25 +20,15 @@ export class PrismicUnpublishWebhookUseCase {
       promises.push(
         new Promise<void>(async (resolve, reject) => {
           try {
-            const document = await this.prismicService.getDocumentById(id)
+            const existent_document =
+              (await this.searchProvider.getGroupedObjects(
+                process.env.INDEX_NAME,
+                id
+              )) as AlgoliaPostDocument[]
 
-            if (document.type != 'post') {
-              resolve()
-              return
-            }
-
-            const existent_document = await this.searchProvider.getObject(
-              process.env.INDEX_NAME,
-              (
-                existent_document: Document & {
-                  objectID: string
-                }
-              ) => existent_document.parent_id == document.id
-            )
-
-            if (existent_document) {
+            if (existent_document.length > 0) {
               try {
-                await this.deleteDocument(document)
+                await this.deleteDocument(existent_document)
                 resolve()
                 return
               } catch (err) {
@@ -60,33 +51,19 @@ export class PrismicUnpublishWebhookUseCase {
     }
   }
 
-  private async deleteDocument(document: PrismicResponse): Promise<void> {
+  private async deleteDocument(
+    documents: AlgoliaPostDocument[]
+  ): Promise<void> {
     try {
       const promises = []
 
-      if (document.data.intro_text.length > 0) {
+      documents.forEach((document: AlgoliaPostDocument) => {
         promises.push(
           new Promise<void>(async (resolve, reject) => {
             try {
               await this.searchProvider.deleteObject(
                 process.env.INDEX_NAME,
-                this.prismicMapper.postToDocument(document, true)
-              )
-              resolve()
-            } catch (err) {
-              reject(err)
-            }
-          })
-        )
-      }
-
-      document.data.conteudo.forEach((conteudo: PrismicPostContent) => {
-        promises.push(
-          new Promise<void>(async (resolve, reject) => {
-            try {
-              await this.searchProvider.deleteObject(
-                process.env.INDEX_NAME,
-                this.prismicMapper.postToDocument(document, false, conteudo)
+                document
               )
               resolve()
             } catch (err) {
