@@ -32,9 +32,7 @@ export class PrismicUnpublishWebhookUseCase {
                 existent_document: Document & {
                   objectID: string
                 }
-              ) =>
-                existent_document.titulo_post ===
-                document.data.titulo_do_post[0].text
+              ) => existent_document.parent_id == document.id
             )
 
             if (existent_document) {
