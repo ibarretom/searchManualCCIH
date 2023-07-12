@@ -15,6 +15,7 @@ export class PrismicService {
     response.forEach((doc: any) => {
       if (doc.data.intro_text.length > 0) {
         objs.push({
+          parent_id: doc.id,
           url: `/post/document/${doc.uid}`,
           titulo_post: doc.data.titulo_do_post[0].text,
           html_id: md5(doc.data.titulo_do_post[0].text),
@@ -26,6 +27,7 @@ export class PrismicService {
 
       doc.data.conteudo.forEach((conteudo: any) => {
         objs.push({
+          parent_id: doc.id,
           url: `/post/document/${doc.uid}`,
           titulo_post: doc.data.titulo_do_post[0].text,
           html_id: md5(conteudo.titulo_do_texto[0].text),
