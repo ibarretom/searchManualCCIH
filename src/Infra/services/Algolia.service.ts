@@ -114,6 +114,7 @@ export class AlgoliaService implements ISearchProvider {
       const response = await index.deleteObject(document.objectID)
       console.log(response)
     } catch (err) {
+      console.log(err)
       throw new Error(err)
     }
   }
