@@ -5,7 +5,12 @@ export async function InitializeAlgolia() {
   const index = AlgoliaClient.initIndex(process.env.INDEX_NAME as string)
 
   await index.setSettings({
-    searchableAttributes: ['titulo_post', 'titulo_do_texto', 'content'],
+    searchableAttributes: [
+      'parent_id',
+      'titulo_post',
+      'titulo_do_texto',
+      'content',
+    ],
     highlightPreTag: '**',
     highlightPostTag: '**',
   })
