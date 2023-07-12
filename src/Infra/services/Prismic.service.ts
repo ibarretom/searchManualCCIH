@@ -1,6 +1,7 @@
 import md5 from 'md5'
 import { Document } from '../../entities/Document'
 import { PrismicResponse } from '../../valueObjects/PrismicResponse'
+import { PrismicPostContent } from '../../valueObjects/PrismicPostContent'
 
 export class PrismicService {
   constructor(private readonly client: any) {}
@@ -12,7 +13,7 @@ export class PrismicService {
 
     const objs: Document[] = []
 
-    response.forEach((doc: any) => {
+    response.forEach((doc: PrismicResponse) => {
       if (doc.data.intro_text.length > 0) {
         objs.push({
           parent_id: doc.id,
@@ -25,7 +26,7 @@ export class PrismicService {
         })
       }
 
-      doc.data.conteudo.forEach((conteudo: any) => {
+      doc.data.conteudo.forEach((conteudo: PrismicPostContent) => {
         objs.push({
           parent_id: doc.id,
           url: `/post/document/${doc.uid}`,
