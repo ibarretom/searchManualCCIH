@@ -23,6 +23,8 @@ export class ElasticService implements ISearchProvider {
 
   getObjectById: (indexName: string, id: string) => Promise<any>
   getObject: (indexName: string, lambdaQuery: Function) => Promise<any>
+  updateData: (indexName: string, document: Document) => Promise<void>
+  deleteObject: (indexName: string, document: Document) => Promise<void>
 
   public async indexData(indexName: string, document: Document): Promise<void> {
     try {
