@@ -1,3 +1,4 @@
+import { compareSync } from 'bcryptjs'
 import { NextFunction, Request, Response } from 'express'
 
 export function PrismicSecretVerify(
@@ -7,8 +8,13 @@ export function PrismicSecretVerify(
 ) {
   const { secret } = req.body
 
-  if (secret !== process.env.PRISMIC_WEBHOOK_SECRET) {
-    return res.status(401).json({ message: 'Invalid secret' })
+  if (
+    !compareSync(
+      `${secret}${process.env.PRISMIC_WEBHOOK_PRIVATE_KEY}`,
+      `${process.env.PRISMIC_WEBHOOK_SECRET}`
+    )
+  ) {
+    return res.status(401).json({ message: 'Unauthorized' })
   }
 
   next()
