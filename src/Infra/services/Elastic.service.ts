@@ -25,6 +25,7 @@ export class ElasticService implements ISearchProvider {
   getObject: (indexName: string, lambdaQuery: Function) => Promise<any>
   updateData: (indexName: string, document: Document) => Promise<void>
   deleteObject: (indexName: string, document: Document) => Promise<void>
+  getGroupedObjects: (indexNameL: string, query: string) => Promise<any>
 
   public async indexData(indexName: string, document: Document): Promise<void> {
     try {

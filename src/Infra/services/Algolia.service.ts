@@ -73,6 +73,21 @@ export class AlgoliaService implements ISearchProvider {
     }
   }
 
+  public async getGroupedObjects(
+    indexName: string,
+    query: string
+  ): Promise<any> {
+    try {
+      const index = this.client.initIndex(indexName)
+
+      const response = await index.search(query.split(';')[0])
+
+      return response.hits
+    } catch (err) {
+      throw new Error(err)
+    }
+  }
+
   public async search(indexName: string, query: Query): Promise<any> {
     try {
       const index = this.client.initIndex(indexName)
