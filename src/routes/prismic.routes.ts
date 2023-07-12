@@ -6,7 +6,7 @@ import { PrismicSecretVerify } from './middlewares/PrismicSecretVerify'
 const prismicRouter = Router()
 
 prismicRouter.post(
-  '/webhook/publish',
+  '/webhhokPublish',
   PrismicSecretVerify,
   async (req: Request, res: Response) => {
     return await prismicWebhookController.handlePublish(req, res)

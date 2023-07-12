@@ -3,11 +3,14 @@ import { ISearchProvider } from '../Infra/services/ISearch.provider'
 import { PrismicService } from '../Infra/services/Prismic.service'
 import { Document } from '../entities/Document'
 import { PrismicResponse } from '../valueObjects/PrismicResponse'
+import { PrismicPostContent } from '../valueObjects/PrismicPostContent'
+import { IPrismicMapper } from '../domain/services/IPrismic.mapper'
 
 export class PrismicPublishWebhookUseCase {
   constructor(
     private readonly prismicService: PrismicService,
-    private readonly searchProvider: ISearchProvider
+    private readonly searchProvider: ISearchProvider,
+    private readonly prismicMapper: IPrismicMapper
   ) {}
 
   async execute(documents: string[]): Promise<void> {
@@ -59,37 +62,33 @@ export class PrismicPublishWebhookUseCase {
   }
 
   private async createDocument(document: PrismicResponse): Promise<void> {
-    const objs: Document[] = []
-
-    if (document.data.intro_text.length > 0) {
-      objs.push({
-        url: `/post/document/${document.uid}`,
-        titulo_post: document.data.titulo_do_post[0].text,
-        html_id: md5(document.data.titulo_do_post[0].text),
-        titulo_do_texto: '',
-        content: document.data.intro_text[0].text,
-        updated_at: document.last_publication_date,
-      })
-    }
-
-    document.data.conteudo.forEach((conteudo: any) => {
-      objs.push({
-        url: `/post/document/${document.uid}`,
-        titulo_post: document.data.titulo_do_post[0].text,
-        html_id: md5(conteudo.titulo_do_texto[0].text),
-        titulo_do_texto: conteudo.titulo_do_texto[0].text,
-        content: conteudo.conteudo_parte1[0].text,
-        updated_at: document.last_publication_date,
-      })
-    })
-
     try {
       const promises = []
-      objs.forEach((obj) => {
+
+      if (document.data.intro_text.length > 0) {
         promises.push(
           new Promise<void>(async (resolve, reject) => {
             try {
-              await this.searchProvider.indexData(process.env.INDEX_NAME, obj)
+              await this.searchProvider.indexData(
+                process.env.INDEX_NAME,
+                this.prismicMapper.postToDocument(document, true)
+              )
+              resolve()
+            } catch (err) {
+              reject(err)
+            }
+          })
+        )
+      }
+
+      document.data.conteudo.forEach((conteudo: PrismicPostContent) => {
+        promises.push(
+          new Promise<void>(async (resolve, reject) => {
+            try {
+              await this.searchProvider.indexData(
+                process.env.INDEX_NAME,
+                this.prismicMapper.postToDocument(document, false, conteudo)
+              )
               resolve()
             } catch (err) {
               reject(err)
@@ -105,38 +104,33 @@ export class PrismicPublishWebhookUseCase {
   }
 
   private async updateDocument(document: PrismicResponse): Promise<void> {
-    const objs: Document[] = []
-
-    if (document.data.intro_text.length > 0) {
-      objs.push({
-        url: `/post/document/${document.uid}`,
-        titulo_post: document.data.titulo_do_post[0].text,
-        html_id: md5(document.data.titulo_do_post[0].text),
-        titulo_do_texto: '',
-        content: document.data.intro_text[0].text,
-        updated_at: document.last_publication_date,
-      })
-    }
-
-    document.data.conteudo.forEach((conteudo: any) => {
-      objs.push({
-        url: `/post/document/${document.uid}`,
-        titulo_post: document.data.titulo_do_post[0].text,
-        html_id: md5(conteudo.titulo_do_texto[0].text),
-        titulo_do_texto: conteudo.titulo_do_texto[0].text,
-        content: conteudo.conteudo_parte1[0].text,
-        updated_at: document.last_publication_date,
-      })
-    })
-
     try {
       const promises = []
 
-      objs.forEach((obj) => {
+      if (document.data.intro_text.length > 0) {
         promises.push(
           new Promise<void>(async (resolve, reject) => {
             try {
-              await this.searchProvider.updateData(process.env.INDEX_NAME, obj)
+              await this.searchProvider.updateData(
+                process.env.INDEX_NAME,
+                this.prismicMapper.postToDocument(document, true)
+              )
+              resolve()
+            } catch (err) {
+              reject(err)
+            }
+          })
+        )
+      }
+
+      document.data.conteudo.forEach((conteudo: PrismicPostContent) => {
+        promises.push(
+          new Promise<void>(async (resolve, reject) => {
+            try {
+              await this.searchProvider.updateData(
+                process.env.INDEX_NAME,
+                this.prismicMapper.postToDocument(document, false, conteudo)
+              )
               resolve()
             } catch (err) {
               reject(err)

@@ -2,6 +2,7 @@ import md5 from 'md5'
 import { Document } from '../../entities/Document'
 import { Query } from '../../valueObjects/Query'
 import { ISearchProvider } from './ISearch.provider'
+import { AlgoliaPostDocument } from '../../entities/AlgoliaPostDocument'
 
 export class AlgoliaService implements ISearchProvider {
   constructor(private readonly client: any) {}
@@ -37,21 +38,12 @@ export class AlgoliaService implements ISearchProvider {
 
   public async updateData(
     indexName: string,
-    document: Document
+    document: AlgoliaPostDocument
   ): Promise<void> {
     try {
-      const objectID = md5(
-        document.html_id + document.titulo_post + document.titulo_do_texto
-      )
-
       const index = this.client.initIndex(indexName)
 
-      const algoliaDocument = {
-        objectID: objectID,
-        ...document,
-      }
-
-      const response = await index.saveObject(algoliaDocument)
+      const response = await index.saveObject(document)
       console.log(response)
     } catch (error: any) {
       throw new Error(error)
@@ -99,6 +91,17 @@ export class AlgoliaService implements ISearchProvider {
       return response
     } catch (error: any) {
       throw new Error(error)
+    }
+  }
+
+  public async deleteObject(
+    indexName: string,
+    document: AlgoliaPostDocument
+  ): Promise<void> {
+    try {
+      console.log(document.objectID)
+    } catch (err) {
+      throw new Error(err)
     }
   }
 }
