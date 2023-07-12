@@ -99,7 +99,10 @@ export class AlgoliaService implements ISearchProvider {
     document: AlgoliaPostDocument
   ): Promise<void> {
     try {
-      console.log(document.objectID)
+      const index = this.client.initIndex(indexName)
+
+      const response = await index.deleteObject(document.objectID)
+      console.log(response)
     } catch (err) {
       throw new Error(err)
     }

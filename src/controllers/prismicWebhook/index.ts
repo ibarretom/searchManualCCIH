@@ -4,6 +4,7 @@ import { AlgoliaService } from '../../Infra/services/Algolia.service'
 import { PrismicService } from '../../Infra/services/Prismic.service'
 import { AlgoliaMapper } from '../../domain/services/Algolia.mapper'
 import { PrismicPublishWebhookUseCase } from '../../useCases/PrismicPublishWebhook.useCase'
+import { PrismicUnpublishWebhookUseCase } from '../../useCases/PrismicUnpublishWebhook.useCase.'
 import { PrismicWebhookController } from './PrismicWebhook.controller'
 
 const prismicService = new PrismicService(prismic_client)
@@ -16,6 +17,13 @@ const prismicUpdateWebhookUseCase = new PrismicPublishWebhookUseCase(
   algoliaMapper
 )
 
+const prismicUnpublishWebhookUseCase = new PrismicUnpublishWebhookUseCase(
+  prismicService,
+  searchProvider,
+  algoliaMapper
+)
+
 export const prismicWebhookController = new PrismicWebhookController(
-  prismicUpdateWebhookUseCase
+  prismicUpdateWebhookUseCase,
+  prismicUnpublishWebhookUseCase
 )
